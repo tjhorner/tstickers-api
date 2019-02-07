@@ -12,3 +12,13 @@ It is suitable for public use -- no API tokens are required.
 - Automatically handles WebP -> PNG conversion
 - Aggressive file caching for fast response times
 - Pre-set CORS headers -- use it in client-side JS immediately
+
+## Docker
+
+A `Dockerfile` is included in this repo, but prebuilt images are available:
+
+```
+docker pull tjhorner/tstickers-api:latest
+```
+
+For your reference, a sample `docker-compose.yml` is also included.

@@ -1,0 +1,12 @@
+version: '3'
+services:
+  web:
+    image: tjhorner/tstickers-api
+    restart: on-failure
+    environment:
+      BOT_TOKEN: "get this from @BotFather"
+      CACHE_TIME: "604800"
+    ports:
+      - "3000:3000"
+    volumes:
+      - "./cache:/app/cache"
