@@ -28,12 +28,20 @@ app.use(cacheControl())
 app.use(cors())
 
 app.get("/pack/:name", async (req, res) => {
+  var packRaw
+
+  try {
+    packRaw = await bot.getStickerSet(req.params.name)
+  } catch(e) {
+    res.status(500)
+    res.send({ error: "Something bad happened. Try again later." })
+    return
+  }
+
   res.cacheControl = {
     maxAge: 120,
     public: true
   }
-
-  const packRaw = await bot.getStickerSet(req.params.name)
 
   var pack = {
     name: packRaw.title,
@@ -54,18 +62,23 @@ app.get("/pack/:name", async (req, res) => {
 })
 
 app.get("/sticker/:id.png", async (req, res) => {
+  try {
+    const stickerUrl = cachedLinks[req.params.id] || (cachedLinks[req.params.id] = await bot.getFileLink(req.params.id))
+    const stickerWebp = await cache.getImage(stickerUrl)
+  
+    const stickerPng = await sharp(stickerWebp).toFormat("png").toBuffer()
+  
+    res.setHeader("Content-Type", "image/png")
+    res.send(stickerPng)
+  } catch(e) {
+    res.sendStatus(500)
+    return
+  }
+
   res.cacheControl = {
     maxAge: parseInt(config.CACHE_TIME),
     public: true
   }
-
-  const stickerUrl = cachedLinks[req.params.id] || (cachedLinks[req.params.id] = await bot.getFileLink(req.params.id))
-  const stickerWebp = await cache.getImage(stickerUrl)
-
-  const stickerPng = await sharp(stickerWebp).toFormat("png").toBuffer()
-
-  res.setHeader("Content-Type", "image/png")
-  res.send(stickerPng)
 })
 
 app.listen(process.env.PORT || 3000)
