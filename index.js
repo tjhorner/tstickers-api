@@ -70,7 +70,9 @@ app.get("/sticker/:id.png", async (req, res) => {
   
     stickerPng = await sharp(stickerWebp).toFormat("png").toBuffer()
   } catch(e) {
-    res.sendStatus(500)
+    res.setHeader("Content-Type", "image/jpeg")
+    res.status(500)
+    res.sendFile(path.join(__dirname, "static", "500.jpg"))
     return
   }
 
