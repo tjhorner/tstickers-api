@@ -62,14 +62,13 @@ app.get("/pack/:name", async (req, res) => {
 })
 
 app.get("/sticker/:id.png", async (req, res) => {
+  var stickerPng
+
   try {
     const stickerUrl = cachedLinks[req.params.id] || (cachedLinks[req.params.id] = await bot.getFileLink(req.params.id))
     const stickerWebp = await cache.getImage(stickerUrl)
   
-    const stickerPng = await sharp(stickerWebp).toFormat("png").toBuffer()
-  
-    res.setHeader("Content-Type", "image/png")
-    res.send(stickerPng)
+    stickerPng = await sharp(stickerWebp).toFormat("png").toBuffer()
   } catch(e) {
     res.sendStatus(500)
     return
@@ -79,6 +78,9 @@ app.get("/sticker/:id.png", async (req, res) => {
     maxAge: parseInt(config.CACHE_TIME),
     public: true
   }
+
+  res.setHeader("Content-Type", "image/png")
+  res.send(stickerPng)
 })
 
 app.listen(process.env.PORT || 3000)
